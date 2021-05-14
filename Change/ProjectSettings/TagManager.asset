@@ -4,15 +4,13 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - RightWall
-  - LeftWall
-  - StartWall
   - ColliderCube
   - UICamera
   - Wall
   - Ground
   - FirstRes
   - SecondRes
+  - Manager
   layers:
   - Default
   - TransparentFX

@@ -79,7 +79,7 @@ public class PlayerController : MonoBehaviour
     public void Run()
     {
         // プレイヤーに重力を与える
-        //SetPlayerGravity();
+        SetPlayerGravity();
         // プレイヤーの移動処理
         MovePlayer();
 
