@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class MapSelectManager : MonoBehaviour
@@ -11,6 +9,9 @@ public class MapSelectManager : MonoBehaviour
     // 最初に選択状態にしたいボタン
     [SerializeField] private Button firstSelectButton;
 
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
     private void Start()
     {
         // 最初に選択状態にしたいボタンの設定
@@ -23,9 +24,9 @@ public class MapSelectManager : MonoBehaviour
     /// <summary>
     /// ボタンクリック処理
     /// </summary>
-    public void OnClick(string stageName)
+    public void OnClick(string sceneName)
     {
-        switch (stageName)
+        switch (sceneName)
         {
             case "Stage1":
                 // 次のシーンをステージ1に変更

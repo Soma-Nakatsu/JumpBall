@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class TitleUIManager : MonoBehaviour
@@ -11,6 +9,9 @@ public class TitleUIManager : MonoBehaviour
     // 最初に選択状態にしたいボタン
     [SerializeField] private Button firstSelectButton;
 
+    /// <summary>
+    /// 初期化処理
+    /// </summary>
     void Start()
     {
         // 最初に選択状態にしたいボタンの設定
@@ -23,9 +24,9 @@ public class TitleUIManager : MonoBehaviour
     /// <summary>
     /// ボタンクリック処理
     /// </summary>
-    public void OnClick(string menuType)
+    public void OnClick(string sceneName)
     {
-        switch (menuType)
+        switch (sceneName)
         {
             case "Tutorial":
                 // 次のシーンをチュートリアルに変更

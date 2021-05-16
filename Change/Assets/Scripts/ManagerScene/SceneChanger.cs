@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class SceneChanger : MonoBehaviour
@@ -9,11 +7,11 @@ public class SceneChanger : MonoBehaviour
     public enum SceneName
     {
         NONE,           // なし
-        Title,             // タイトル
-        MapSelect,    // マップセレクト
+        Title,          // タイトル
+        MapSelect,      // マップセレクト
         Tutorial,       // チュートリアル
-        Stage1,        // ステージ1
-        Stage2,        // ステージ2
+        Stage1,         // ステージ1
+        Stage2,         // ステージ2
     }
     // 今のシーン
     [SerializeField] private SceneName nowScene = SceneName.NONE;
