@@ -25,6 +25,7 @@ public class ClearCube : MonoBehaviour
     /// </summary>
     private void UpdateGameState()
     {
+        // ゲームの状態をクリアに変更
         stageManager.gameState = StageManager.GameState.CLEAR;
     }
 }

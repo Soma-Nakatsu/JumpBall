@@ -10,7 +10,6 @@ public class StartCube : MonoBehaviour
     /// <summary>
     /// もしオブジェクトをすり抜けたら
     /// </summary>
-    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
         // Playerタグのオブジェクトかつゲームの状態がNONEなら
@@ -26,6 +25,7 @@ public class StartCube : MonoBehaviour
     /// </summary>
     private void  UpdateGameState()
     {
+        // ゲームの状態をゲーム中に変更
         stageManager.gameState = StageManager.GameState.GAME;
     }
 }

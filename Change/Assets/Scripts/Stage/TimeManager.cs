@@ -7,14 +7,14 @@ public class TimeManager : MonoBehaviour
     private GameManager gameManager;
 
     // 今のステージ番号
-    [SerializeField] int nowStageNumber;
+    [SerializeField] private int nowStageNumber;
 
     // 今のタイム
     [SerializeField] private float nowTime = 0;
     // 最速タイム
     [SerializeField] private float fastestTime;
-    // チェックポイント(リスポーン地点)経過タイム
-    [SerializeField] private float checkPointTime = 0;
+    // リスポーン地点経過タイム
+    [SerializeField] private float passingTime = 0;
 
     /// <summary>
     /// 初期化処理
@@ -38,11 +38,11 @@ public class TimeManager : MonoBehaviour
     }
 
     /// <summary>
-    /// チェックポイント(リスポーン地点)経過タイムのゲッター、セッター
+    /// リスポーン地点通過タイムのゲッター、セッター
     /// </summary>
-    public float GetSetCheckPointTime
+    public float GetSetPassingTime
     {
-        get { return checkPointTime; }
-        set { checkPointTime = value; }
+        get { return passingTime; }
+        set { passingTime = value; }
     }
 }

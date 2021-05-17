@@ -6,7 +6,7 @@ public class StageManager : MonoBehaviour
     public enum GameState
     {
         NONE,   // スタート地点から出ていない
-        GAME,    // ゲーム中
+        GAME,   // ゲーム中
         CLEAR,  // ゲームクリア
     }
     // enum変数宣言
@@ -81,6 +81,6 @@ public class StageManager : MonoBehaviour
         if (player.GetSetIsUpdateResPos) gameState = GameState.NONE;
 
         // nowタイムをチェックポイント(リスポーン地点)通過時の時間に戻す
-        timeManager.GetSetNowTime = timeManager.GetSetCheckPointTime;
+        timeManager.GetSetNowTime = timeManager.GetSetPassingTime;
     }
 }
