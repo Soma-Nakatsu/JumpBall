@@ -13,7 +13,7 @@ m_ProjectFiles:
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 637568425962379851
+      ticks: 637570395504589332
     m_Hash: 3387229500
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
@@ -330,7 +330,7 @@ m_PackageAssets:
       hasRepository: 1
       repository:
         type: git
-        url: https://github.com/Unity-Technologies/Graphics.git
+        url: git+https://github.com/Unity-Technologies/Graphics.git
         revision: 267c9ab2b6aae8e296d78e27ca27af29b3bc7606
         path: 
     - packageId: com.unity.probuilder@4.2.3

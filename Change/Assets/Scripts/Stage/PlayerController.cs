@@ -4,17 +4,15 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     #region 変数宣言
-    // StageManager変数
-    [SerializeField] private StageManager stageManager;
     // CameraController変数
     [SerializeField] private CameraController camController;
 
     // プレイヤージャンプ音
-    // [SerializeField] private AudioClip jumpSound;
+    [SerializeField] private AudioClip jumpSound;
     // プレイヤー着地音
-    // [SerializeField] private AudioClip landingSound;
+    [SerializeField] private AudioClip landingSound;
     // オーディオソース
-    // AudioSource audioSource;
+    AudioSource audioSource;
 
     // プレイヤーのスピード
     [SerializeField] private float speed;
@@ -39,7 +37,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool isDead;
     // リスポーン地点が更新されたか
     [SerializeField] private bool isUpdateResPos;
-    // プレイヤー移動無効フラグ
+    // プレイヤー入力無効フラグ
     [SerializeField] private bool moveInvalidFlag; 
 
     // プレイヤーに与える重力
@@ -63,7 +61,7 @@ public class PlayerController : MonoBehaviour
     public void Init()
     {
         // コンポーネント取得
-        // audioSource = GetComponent<AudioSource>();
+        audioSource = GetComponent<AudioSource>();
 
         // RigidBodyの重力を使わないようにする
         rb.useGravity = false;
@@ -105,7 +103,7 @@ public class PlayerController : MonoBehaviour
             isJump = false;
 
             // 着地音再生
-            //audioSource.PlayOneShot(landingSound);
+            audioSource.PlayOneShot(landingSound);
         }
 
         // Wallタグのオブジェクトかつジャンプ中なら
@@ -147,16 +145,9 @@ public class PlayerController : MonoBehaviour
         cameraForward = Vector3.Scale(camController.transform.forward, new Vector3(1, 0, 1)).normalized;
         // 方向キーの入力値とカメラの向きから、移動方向を決定
         moveVec = cameraForward * z + camController.transform.right * x;
-
-        // キャラクターの向を進行方向に
-        if (moveVec != Vector3.zero)
-        {
-            // プレイヤーを回転させる
-            transform.rotation = Quaternion.LookRotation(moveVec);
-        }
         #endregion
 
-        // 移動無効フラグがfalseなら
+        // 入力無効フラグがfalseなら
         if (!moveInvalidFlag)
         {
             // 横移動入力
@@ -214,7 +205,7 @@ public class PlayerController : MonoBehaviour
             // ジャンプ力を加える
             rb.AddForce(transform.up * jumpPower, ForceMode.Impulse);
             // ジャンプ音再生
-            // audioSource.PlayOneShot(jumpSound);
+            audioSource.PlayOneShot(jumpSound);
             // ジャンプ中
             isJump = true;
 
@@ -234,7 +225,7 @@ public class PlayerController : MonoBehaviour
             // 壁ジャンプ力を加える
             rb.AddForce(new Vector3(-wallJumpVec.x, wallJumpVec.y, -wallJumpVec.z), ForceMode.Impulse);
             // ジャンプ音再生
-            // audioSource.PlayOneShot(jumpSound);
+            audioSource.PlayOneShot(jumpSound);
 
             // ジャンプ力をデフォルトに戻す
             jumpPower = defaultJumpPower;
@@ -292,7 +283,11 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// 移動入力フラグのセッター
     /// </summary>
-    public bool SetMoveInvalidFlag { set { moveInvalidFlag = value; } }
+    public bool GetSetMoveInvalidFlag
+    {
+        get { return moveInvalidFlag; }
+        set { moveInvalidFlag = value; }
+    }
 
     /// <summary>
     /// プレイヤーリスポーン地点のセッター

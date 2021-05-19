@@ -5,14 +5,12 @@ using UnityEngine;
 public class PlayerRes : MonoBehaviour
 {
     #region 変数宣言
-    // StageManager変数
-    [SerializeField] private StageManager stageManager;
     // TimeManager変数
     [SerializeField] private TimeManager timeManager;
     // PlayerController変数
     [SerializeField] private PlayerController player;
 
-    // ステージ１の一つ目のリスポーン位置
+    // リスポーン位置
     [SerializeField] private Vector3 playerResPos;
 
     // プレイヤーがすり抜けたか

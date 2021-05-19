@@ -25,9 +25,16 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 最速タイムのゲッター
     /// </summary>
-    public float GetFastestTime( int stageNumber) { return fastestTime[stageNumber]; }
+    public float GetFastestTime( int stageNumber)
+    {
+        return fastestTime[stageNumber];
+    }
+
     /// <summary>
     /// 最速タイムのセッター
     /// </summary>
-    public void SetFastestTime(float fastestTime, int stageNumber){ this.fastestTime[stageNumber] = fastestTime; }
+    public void SetFastestTime(float fastestTime, int stageNumber)
+    {
+        this.fastestTime[stageNumber] = fastestTime;
+    }
 }

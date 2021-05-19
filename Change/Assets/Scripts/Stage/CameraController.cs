@@ -71,8 +71,12 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void NowAngle()
     {
-        // スティックの位置を現在のアングルに
-        angle = new Vector3(Input.GetAxis("R_Stick_H") * rotateSpeed, Input.GetAxis("R_Stick_V") * rotateSpeed, 0);
+        // プレイヤーの入力無効フラグがfalseなら
+        if (!player.GetSetMoveInvalidFlag)
+        {
+            // スティックの位置を現在のアングルに
+            angle = new Vector3(Input.GetAxis("R_Stick_H") * rotateSpeed, Input.GetAxis("R_Stick_V") * rotateSpeed, 0);
+        }
     }
 
     /// <summary>

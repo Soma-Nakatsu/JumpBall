@@ -66,8 +66,8 @@ public class StageManager : MonoBehaviour
 
             // ゲームクリア
             case GameState.CLEAR:
-                // プレイヤーを移動無効にする
-                player.SetMoveInvalidFlag = true;
+                // プレイヤーを入力無効にする
+                player.GetSetMoveInvalidFlag = true;
                 break;
         }
     }
@@ -77,10 +77,10 @@ public class StageManager : MonoBehaviour
     /// </summary>
     private void IsDeadPlayer()
     {
-        // リスポーン地点が更新されていたらゲーム状態をNONEへ
-        if (player.GetSetIsUpdateResPos) gameState = GameState.NONE;
+        // リスポーン地点が更新されていなかったらゲーム状態をNONEへ
+        if (!player.GetSetIsUpdateResPos) gameState = GameState.NONE;
 
-        // nowタイムをチェックポイント(リスポーン地点)通過時の時間に戻す
+        // nowタイムをリスポーン地点通過時の時間に戻す(リスポーン地点を通過していなかったら0が入る)
         timeManager.GetSetNowTime = timeManager.GetSetPassingTime;
     }
 }
