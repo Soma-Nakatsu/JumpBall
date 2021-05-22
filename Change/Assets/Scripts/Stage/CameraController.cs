@@ -35,7 +35,7 @@ public class CameraController : MonoBehaviour
     private Vector3 playerPos;
 
     // rayが壁に当たった時に入る変数
-    private RaycastHit wallHit;
+    private RaycastHit stageHit;
     #endregion
 
     /// <summary>
@@ -54,8 +54,12 @@ public class CameraController : MonoBehaviour
     /// </summary>
     public void Run()
     {
-        // スティックの位置を現在のアングルにする
-        NowAngle();
+        // プレイヤーの入力無効フラグがfalseなら
+        if (!player.GetSetMoveInvalidFlag)
+        {
+            // スティックの位置を現在のアングルにする
+            NowAngle();
+        }
         // カメラの視野角変更
         ChangeView();
         // プレイヤーに合わせたカメラの移動
@@ -71,12 +75,8 @@ public class CameraController : MonoBehaviour
     /// </summary>
     private void NowAngle()
     {
-        // プレイヤーの入力無効フラグがfalseなら
-        if (!player.GetSetMoveInvalidFlag)
-        {
-            // スティックの位置を現在のアングルに
-            angle = new Vector3(Input.GetAxis("R_Stick_H") * rotateSpeed, Input.GetAxis("R_Stick_V") * rotateSpeed, 0);
-        }
+        // スティックの位置を現在のアングルに
+        angle = new Vector3(Input.GetAxis("R_Stick_H") * rotateSpeed, Input.GetAxis("R_Stick_V") * rotateSpeed, 0);
     }
 
     /// <summary>
@@ -129,14 +129,15 @@ public class CameraController : MonoBehaviour
         // カメラを元の距離まで戻す
         transform.position = player.transform.position - transform.rotation * Vector3.forward * distance;
 
-        // Line処理(Lineの開始地点, Lineの終了地点, 当たった時のLinecastの情報, レイヤーマスク)
-        if (Physics.Linecast(player.transform.position, transform.position, out wallHit, stageLayer))
+        // プレイヤーとカメラの間にstageLayerのオブジェクトがないか調べる
+        //Linecast処理(Lineの開始地点, Lineの終了地点, 当たった時のLinecastの情報, レイヤーマスク)
+        if (Physics.Linecast(player.transform.position, transform.position, out stageHit, stageLayer))
         {
             // Rayが当たった場所にカメラを持ってくる
-            transform.position = wallHit.point;
+            transform.position = stageHit.point;
         }
 
         // Lineの可視化(Lineの開始地点, Lineの終了地点, Lineの色, Lineが写る時間)
-        Debug.DrawLine(player.transform.position, transform.position, Color.red, 0f, false);
+        Debug.DrawLine(player.transform.position, transform.position, Color.red, 0f);
     }
 }

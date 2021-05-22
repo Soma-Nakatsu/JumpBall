@@ -1,6 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TutorialManager : MonoBehaviour
 {
@@ -11,7 +10,13 @@ public class TutorialManager : MonoBehaviour
     // GoToMapSelect変数
     [SerializeField] private GoToMapSelect goToMapSelect;
 
-    void Start()
+    private void Awake()
+    {
+        // チュートリアルUI呼び出し
+        SceneManager.LoadSceneAsync("TutorialUI", LoadSceneMode.Additive);
+    }
+
+    private void Start()
     {
         // プレイヤー初期化
         player.Init();
@@ -21,7 +26,7 @@ public class TutorialManager : MonoBehaviour
         goToMapSelect.Init();
     }
 
-    void Update()
+    private void Update()
     {
         // プレイヤー更新
         player.Run();

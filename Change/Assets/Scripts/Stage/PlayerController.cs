@@ -4,6 +4,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     #region 変数宣言
+    // 足元の影
+    [SerializeField] private GameObject footShadow;
+
     // CameraController変数
     [SerializeField] private CameraController camController;
 
@@ -13,6 +16,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip landingSound;
     // オーディオソース
     AudioSource audioSource;
+
+    // プレイヤーのメッシュレンダラー
+    [SerializeField] private MeshRenderer meshRenderer;
+    // 初期のHDRカラーパネル
+    [SerializeField] [ColorUsage(false, true)] private Color defaultColor;
+    // 変更後のHDRカラーパネル
+    [SerializeField] [ColorUsage(false, true)] private Color changeColor;
+
+    // ポイントライト
+    [SerializeField] private Light pointLight;
 
     // プレイヤーのスピード
     [SerializeField] private float speed;
@@ -29,6 +42,9 @@ public class PlayerController : MonoBehaviour
     // プレイヤー移動用
     private float x, z;
 
+    // ステージのレイヤーマスク(Unity側で8がStageCubeと設定してある)8のフラグを立てる
+    private int stageLayer = 1 << 8;
+
     // ジャンプ中か
     [SerializeField] private bool isJump;
     // 壁ジャンプが可能か
@@ -40,16 +56,19 @@ public class PlayerController : MonoBehaviour
     // プレイヤー入力無効フラグ
     [SerializeField] private bool moveInvalidFlag; 
 
-    // プレイヤーに与える重力
-    [SerializeField] private Vector3 gravity;
     // プレイヤー復活位置
     [SerializeField] private Vector3 resPos;
     // 移動用ベクトル
     private Vector3 moveVec;
+    // ジャンプ用ベクトル
+    private Vector3 JumpVec;
     // 壁ジャンプ用ベクトル
     private Vector3 wallJumpVec;
     // カメラの向き
     private Vector3 cameraForward;
+
+    // rayがマップ当たった時に入る変数
+    private RaycastHit stageHit;
 
     // PlayerのRigidBody変数
     [SerializeField] private Rigidbody rb;
@@ -63,13 +82,13 @@ public class PlayerController : MonoBehaviour
         // コンポーネント取得
         audioSource = GetComponent<AudioSource>();
 
-        // RigidBodyの重力を使わないようにする
-        rb.useGravity = false;
+        // 変更するマテリアルのパラメータを事前に知らせる。
+        meshRenderer.material.EnableKeyword("_EMISSION");
 
         // 移動用ベクトルに代入
         moveVec = new Vector3(x, 0, z);
-        // 壁ジャンプ用ベクトルに代入
-        wallJumpVec = new Vector3(x, jumpPower, z);
+        // ジャンプ力初期化
+        jumpPower = defaultJumpPower;
     }
 
     /// <summary>
@@ -77,14 +96,21 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void Run()
     {
-        // プレイヤーに重力を与える
-        SetPlayerGravity();
+        // プレイヤーの進行方向決定処理
+        DirectionDecision();
 
-        // プレイヤーの移動処理
-        MovePlayer();
+        // 入力無効フラグがfalseなら
+        if (!moveInvalidFlag)
+        {
+            // プレイヤーの移動処理
+            MovePlayer();
 
-        //プレイヤーのジャンプ処理
-        JumpPlayer();
+            //プレイヤーのジャンプ処理
+            JumpPlayer();
+        }
+
+        // プレイヤー影を計算
+        DrawPlayerShadow();
 
         // プレイヤーが死んだら死亡処理を行う
         if (isDead) StartCoroutine(DeadPlayer());
@@ -128,11 +154,14 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     /// <summary>
-    /// プレイヤーに重力を与える
+    /// プレイヤーの進行方向決定処理
     /// </summary>
-    private void SetPlayerGravity()
+    private void DirectionDecision()
     {
-        rb.AddForce(gravity, ForceMode.Acceleration);
+        // カメラの方向から、X-Z平面の単位ベクトルを取得
+        cameraForward = Vector3.Scale(camController.transform.forward, new Vector3(1, 0, 1)).normalized;
+        // 方向キーの入力値とカメラの向きから、移動方向を決定
+        moveVec = cameraForward * z + camController.transform.right * x;
     }
 
     /// <summary>
@@ -140,21 +169,10 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     private void MovePlayer()
     {
-        #region プレイヤーの進行方向決定処理
-        // カメラの方向から、X-Z平面の単位ベクトルを取得
-        cameraForward = Vector3.Scale(camController.transform.forward, new Vector3(1, 0, 1)).normalized;
-        // 方向キーの入力値とカメラの向きから、移動方向を決定
-        moveVec = cameraForward * z + camController.transform.right * x;
-        #endregion
-
-        // 入力無効フラグがfalseなら
-        if (!moveInvalidFlag)
-        {
-            // 横移動入力
-            x = Input.GetAxis("L_Stick_H") * speed;
-            // 左移動入力
-            z = Input.GetAxis("L_Stick_V") * speed;
-        }
+        // 横移動入力
+        x = Input.GetAxis("L_Stick_H") * speed;
+        // 左移動入力
+        z = Input.GetAxis("L_Stick_V") * speed;
 
         // 速度制限
         if (rb.velocity.magnitude < maxSpeed)
@@ -177,7 +195,24 @@ public class PlayerController : MonoBehaviour
             {
                 // ジャンプ力を増やす
                 jumpPower += upJumpPower;
+
+                // メッシュの色を変える
+                meshRenderer.material.SetColor("_EmissionColor", changeColor);
+
+                // ポイントライトの強度が9以下なら
+                if (pointLight.intensity <= 9)
+                {
+                    // ポイントライトの強度を1増やす
+                    pointLight.intensity += 1;
+                }
             }
+        }
+        else
+        {
+            // メッシュの色を元に戻す
+            meshRenderer.material.SetColor("_EmissionColor", defaultColor);
+            // ポイントライトの強度を0にする
+            pointLight.intensity = 0;
         }
 
         // 壁ジャンプが可能でないなら
@@ -202,8 +237,10 @@ public class PlayerController : MonoBehaviour
         // ジャンプボタンが離されるかつジャンプ中じゃなければ
         if (Input.GetKeyUp("joystick button 0") && !isJump)
         {
+            // ジャンプ用ベクトルに代入
+            JumpVec = new Vector3(0, jumpPower, 0);
             // ジャンプ力を加える
-            rb.AddForce(transform.up * jumpPower, ForceMode.Impulse);
+            rb.AddForce(JumpVec, ForceMode.Impulse);
             // ジャンプ音再生
             audioSource.PlayOneShot(jumpSound);
             // ジャンプ中
@@ -234,12 +271,32 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     /// <summary>
+    /// // プレイヤー影を計算
+    /// </summary>
+    private void DrawPlayerShadow()
+    {
+        // 影を表示する場所を計算
+        //Raycast処理(Rayの開始地点, Rayの向き, 当たった時のRaycastの情報, レイヤーマスク)
+        if (Physics.Raycast(transform.position, Vector3.down, out stageHit, 10.0f, stageLayer))
+        {
+            // Rayが当たった場所に影を持ってくる(影のちらつきを防止するために0.0001f分座標を上げる)
+            footShadow.transform.position = stageHit.point + new Vector3(0, 0.0001f, 0);
+        }
+
+        // Rayの可視化(rayの開始地点, Rayの向き, Rayの色, Rayが写る時間)
+        Debug.DrawRay(transform.position, Vector3.down * 10, Color.red, 0f);
+    }
+
+    /// <summary>
     /// プレイヤーの死亡処理
     /// </summary>
     private IEnumerator DeadPlayer()
     {
         // プレイヤー固定
         rb.constraints = RigidbodyConstraints.FreezeAll;
+
+        // 操作無効
+        moveInvalidFlag = true;
 
         // ジャンプ力を初期ジャンプ力に
         jumpPower = defaultJumpPower;
@@ -252,6 +309,9 @@ public class PlayerController : MonoBehaviour
 
         // プレイヤーの固定解除
         rb.constraints = RigidbodyConstraints.None;
+
+        // 操作有効
+        moveInvalidFlag = false;
 
         // 生き返った
         isDead = false;
